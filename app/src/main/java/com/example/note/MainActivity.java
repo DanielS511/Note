@@ -44,6 +44,29 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    /*
+    Update data for permanent store
+     */
+    public void updateData(){
+        try {
+            SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("com.example.note", MODE_PRIVATE);
+            sharedPreferences.edit().putString("title", ObjectSerializer.serialize(MainActivity.title)).apply();
+            sharedPreferences.edit().putString("note", ObjectSerializer.serialize(MainActivity.note)).apply();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    protected void getData(){
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("com.example.note", MODE_PRIVATE);
+        try {
+            title = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("title", ObjectSerializer.serialize(new ArrayList<String>())));
+            note = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("note", ObjectSerializer.serialize(new ArrayList<String>())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,9 +76,13 @@ public class MainActivity extends AppCompatActivity {
         note = new ArrayList<>();
 
         SharedPreferences sharedPreferences = getSharedPreferences("com.example.note", MODE_PRIVATE);
+        getData();
 
-        note.add("This is where you can type your life");
-        title.add("note example");
+        if (note.size() == 0 || title.size() == 0){
+            note.add("This is where you can type your life");
+            title.add("note example");
+        }
+
         arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, title);
         noteMainListView.setAdapter(arrayAdapter);
 
@@ -80,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                                  note.remove(position);
                                  title.remove(position);
                                  arrayAdapter.notifyDataSetChanged();
+                                 updateData();
                              }
                          })
                          .setNegativeButton("no", new DialogInterface.OnClickListener() {

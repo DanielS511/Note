@@ -17,6 +17,19 @@ public class NoteEditor extends AppCompatActivity {
     EditText titleEditText;
     EditText noteEditText;
     /*
+    Update data for permanent store
+     */
+    public void updateData(){
+        try {
+            SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("com.example.note", MODE_PRIVATE);
+            sharedPreferences.edit().putString("title", ObjectSerializer.serialize(MainActivity.title)).apply();
+            sharedPreferences.edit().putString("note", ObjectSerializer.serialize(MainActivity.note)).apply();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /*
     Initialize the Title and Note according to the note id
      */
     protected void initializeTextView(){
@@ -31,6 +44,7 @@ public class NoteEditor extends AppCompatActivity {
             MainActivity.title.add("");
             MainActivity.arrayAdapter.notifyDataSetChanged();
             MainActivity.note.add("");
+            updateData();
         }
     }
 
@@ -40,6 +54,7 @@ public class NoteEditor extends AppCompatActivity {
         setContentView(R.layout.activity_note_editor);
         titleEditText = (EditText) findViewById(R.id.titleEditText);
         noteEditText = (EditText) findViewById(R.id.noteEditText);
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("com.example.note", MODE_PRIVATE);
         initializeTextView();
 
         titleEditText.addTextChangedListener(new TextWatcher() {
@@ -52,6 +67,7 @@ public class NoteEditor extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 MainActivity.title.set(noteID,String.valueOf(s));
                 MainActivity.arrayAdapter.notifyDataSetChanged();
+                updateData();
             }
 
             @Override
@@ -68,6 +84,7 @@ public class NoteEditor extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 MainActivity.note.set(noteID,String.valueOf(s));
+                updateData();
             }
 
             @Override
