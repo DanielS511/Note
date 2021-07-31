@@ -47,16 +47,10 @@ public class NoteEditor extends AppCompatActivity {
             updateData();
         }
     }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_note_editor);
-        titleEditText = (EditText) findViewById(R.id.titleEditText);
-        noteEditText = (EditText) findViewById(R.id.noteEditText);
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("com.example.note", MODE_PRIVATE);
-        initializeTextView();
-
+    /*
+    Create listeners for both note edittext and title editText
+     */
+    protected void createTextListeners(){
         titleEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -67,7 +61,7 @@ public class NoteEditor extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 MainActivity.title.set(noteID,String.valueOf(s));
                 MainActivity.arrayAdapter.notifyDataSetChanged();
-                updateData();
+                updateData();// we want to update data everytime the text change
             }
 
             @Override
@@ -92,5 +86,16 @@ public class NoteEditor extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_note_editor);
+        titleEditText = (EditText) findViewById(R.id.titleEditText);
+        noteEditText = (EditText) findViewById(R.id.noteEditText);
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("com.example.note", MODE_PRIVATE);
+        initializeTextView();
+        createTextListeners();
     }
 }

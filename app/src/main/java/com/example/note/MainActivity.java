@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /*
+    Get former data from the device
+     */
     protected void getData(){
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("com.example.note", MODE_PRIVATE);
         try {
@@ -66,60 +69,70 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ListView noteMainListView = findViewById(R.id.noteMainListView);
-        title = new ArrayList<>();
-        note = new ArrayList<>();
-
-        SharedPreferences sharedPreferences = getSharedPreferences("com.example.note", MODE_PRIVATE);
+    /*
+    Initialize two arraylist -- title and note
+     */
+    protected void setData(){
         getData();
 
         if (note.size() == 0 || title.size() == 0){
             note.add("This is where you can type your life");
             title.add("note example");
         }
-
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, title);
+    }
+    /*
+    Set up the main list view:
+        Display titles
+        A click listener to let user edit text in NoteEditor activity for specific title
+        A long click listener to delete some note
+     */
+    public void setNoteListView(){
+        ListView noteMainListView = findViewById(R.id.noteMainListView);
+        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, title);// display title
         noteMainListView.setAdapter(arrayAdapter);
 
-         noteMainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-             @Override
-             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                 Intent intent = new Intent(getApplicationContext(),NoteEditor.class);
-                 intent.putExtra("NoteID", position);
-                 startActivity(intent);
-             }
-         });
-         noteMainListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-             @Override
-             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
-                         .setIcon(android.R.drawable.ic_dialog_alert)
-                         .setTitle("Alert!")
-                         .setMessage("Do you want to delete a note")
-                         .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                             @Override
-                             public void onClick(DialogInterface dialog, int which) {
-                                 note.remove(position);
-                                 title.remove(position);
-                                 arrayAdapter.notifyDataSetChanged();
-                                 updateData();
-                             }
-                         })
-                         .setNegativeButton("no", new DialogInterface.OnClickListener() {
-                             @Override
-                             public void onClick(DialogInterface dialog, int which) {
+        noteMainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // move to NoteEditor activity
+                Intent intent = new Intent(getApplicationContext(),NoteEditor.class);
+                intent.putExtra("NoteID", position);
+                startActivity(intent);
+            }
+        });
 
-                             }
-                         })
-                         .show();
-                 return true;
-             }
-         });
+        noteMainListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Alert!")
+                        .setMessage("Do you want to delete a note")
+                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //delete the note
+                                note.remove(position);
+                                title.remove(position);
+                                arrayAdapter.notifyDataSetChanged();
+                                updateData();
+                            }
+                        })
+                        .setNegativeButton("no", null)
+                        .show();
+                return true;
+            }
+        });
+    }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        title = new ArrayList<>();
+        note = new ArrayList<>();
+        setData();
+        setNoteListView();
     }
 }
